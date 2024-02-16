@@ -91,7 +91,7 @@ class UI:
      
         fig, ax = plt.subplots()
         ax.bar(df["Commute Type"], df["Cost"], color=['blue', 'green', 'red'])
-        ax.set_xlabel("Car Category")
+        ax.set_xlabel("Category")
         ax.set_ylabel("Cost")
         ax.set_title(f"""Total price of Different Commute Types over {PARAM.PERIOD} years""")
         self.addlabels(df["Commute Type"],  df["Cost"])
@@ -107,9 +107,20 @@ class UI:
         st.markdown('#')
         st.markdown(multi)
 
-        st.write("By Mousbah Barake. check out this [HoneyInCoffee](https://www.honeyincoffee.com/)")
-        st.write("[Linkedin](https://www.linkedin.com/in/mbarake/)")
+        st.write("By Mousbah Barake (https://www.linkedin.com/in/mbarake/)")
+       
+
+        st.markdown(
+            '<div style="margin-top: 0.75em;"><a href="https://www.honeyincoffee.com/" target="_blank"><img src="https://primary.jwwb.nl/public/p/n/q/temp-kpsnnbdlqeuhnoqwnbla/3alqt3/man2oushe_honey_in_coffee_87904c0b-741f-4f4d-9ef0-22e5387bf01a.png?enable-io=true&enable=upscale&crop=864%2C864%2Cx0%2Cy0%2Csafe&width=98&height=98" alt="Buy Me A Coffee" height="100" width="100"></a></div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<div style="margin-top: 0.75em;"><a href="https://www.buymeacoffee.com/mbarake" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a></div>',
+            unsafe_allow_html=True,
+        )
+       
 
 if __name__ == "__main__":
-    pullsystem = UI()
-    pullsystem.create_ui()
+    ui = UI()
+    ui.create_ui()
