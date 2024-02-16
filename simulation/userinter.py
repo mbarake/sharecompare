@@ -1,16 +1,21 @@
 import streamlit as st
 from compare import Compare
-from constants import PARAM
+from constants import PARAM, TAXI, RENT, SHARE
 import pandas as pd
 import matplotlib.pyplot as plt
 
 class UI:
+
+
     
     @staticmethod
     def addlabels(x,y):
         for i in range(len(x)):
             plt.text(i, y[i], y[i], ha = 'center')
-     
+
+    def __init__(self) -> None:
+        self.sim = Compare()
+
     def create_ui(self):
         st.header('Comparison of costs between owning and sharing a car.')
         st.markdown('#')
@@ -18,9 +23,8 @@ class UI:
             # Creating sliders for parameters
             st.title("General Param")
             period = st.slider('Period in years', min_value=1, max_value=20, value=PARAM.PERIOD)
-            kmdriven = st.slider('KM Driver per year', min_value=1000, max_value=25000, value=PARAM.KMDRIVERPERYEAR)
+            kmdriven = st.slider('KM Driver per year', min_value=100, max_value=25000, value=PARAM.KMDRIVERPERYEAR)
            
-
             st.divider()
 
             st.title("Car Ownership")
@@ -37,45 +41,65 @@ class UI:
           
             st.divider()
             st.title("Car Sharing")
-            howmany = st.slider('How many days rented/shared per month', min_value=1, max_value=30, value=PARAM.HOWMANYTIMESPERMONTH)
-            travel = st.slider('Cost of travelling forth and back to get the car', min_value=0, max_value=30, value=PARAM.TRAVELTOSHARE)
+            share_rate = st.slider('Daily rate', min_value=45, max_value=150, value=SHARE.RATE)
+            share_km_rate = st.slider('Rate per km', min_value=0.2, max_value=0.25, value=SHARE.KMRATE, step=0.01)
+            share_freq = st.slider('How many days shared per month', min_value=1, max_value=30, value=SHARE.HOWMANYTIMESPERMONTH)
+            share_travel = st.slider('Cost of travelling forth and back to get the car', min_value=0, max_value=30, value=SHARE.TRAVEL)
+
+            st.divider()
+            st.title("Car Rental")
+            rent_rate = st.slider('Daily rate', min_value=20, max_value=150, value=RENT.RATE)
+            rent_freq = st.slider('How many days rented per month', min_value=1, max_value=30, value=RENT.HOWMANYTIMESPERMONTH)
+            rent_travel = st.slider('Cost of travelling forth and back to get the car', min_value=0, max_value=30, value=RENT.TRAVEL)
+
+            st.divider()
+            st.title("Hire a Taxi")
+            taxi_rate = st.slider('Cost per KM', min_value=1, max_value=10, value=TAXI.RATE)
            
        
-        sim = Compare()
-        Compare.PERIOD=period
-        Compare.KMDRIVERPERYEAR=kmdriven
-        Compare.HOWMANYTIMESPERMONTH=howmany
-        Compare.FUELPRICE = fuelprice
-        Compare.COSTPERYEAR = costperyear
-        Compare.INSURANCE=insurance
-        Compare.ROADTAX = roadtax
-        Compare.MAINENACE = maintenance
-        Compare.EFFICIENCY = efficiency
-        Compare.TRAVELTOSHARE = travel
+       
+        self.sim.period = period
+        self.sim.km_driver_per_year = kmdriven
+        self.sim.cost_per_year = costperyear
+        self.sim.fuel_price = fuelprice
+        self.sim.insurance = insurance
+        self.sim.roadtax = roadtax
+        self.sim.maintenance = maintenance
+        self.sim.efficiency = efficiency
+        
+        self.sim.share_freq = share_freq
+        self.sim.share_travel = share_travel
+        self.sim.share_rate = share_rate
+        self.sim.share_km_rate = share_km_rate
 
-        res = sim.get_results()
+        self.sim.rent_freq = rent_freq
+        self.sim.rent_price = rent_rate
+        self.sim.rent_travel = rent_travel
+        
+        self.sim.taxi_rate = taxi_rate
+
+      
+        res = self.sim.get_results()
 
         data = {
-            "Commute Type": ["Car Ownership", "Car Share 1", "Car Share 2"],
-            "Price": res  # Example prices in dollars
+            "Commute Type": ["Car Ownership", "Car Share", "Car Rental", "Taxi Hire"],
+            "Cost": res  # Example prices in dollars
         }
-
 
         df = pd.DataFrame(data)
 
      
         fig, ax = plt.subplots()
-        ax.bar(df["Commute Type"], df["Price"], color=['blue', 'green', 'red'])
+        ax.bar(df["Commute Type"], df["Cost"], color=['blue', 'green', 'red'])
         ax.set_xlabel("Car Category")
-        ax.set_ylabel("Price")
-        ax.set_title(f"""Total price of Different Commute Types over {Compare.PERIOD} years""")
-        self.addlabels(df["Commute Type"],  df["Price"])
+        ax.set_ylabel("Cost")
+        ax.set_title(f"""Total price of Different Commute Types over {PARAM.PERIOD} years""")
+        self.addlabels(df["Commute Type"],  df["Cost"])
 
 
         st.pyplot(fig)
         st.markdown('#')
-        st.text("Car Share 1: 66 euros per day and 50 km free per day. \n If you exceed 50 km you are charged at €0.25 per km.")
-        st.text("Car Share 2: 55 euros per day and 50 km free per day. \n If you exceed 50 km you are charged at €0.20 per km.")
+        st.text("Car Share has a typical rate between 50 and 80 euros per day and 50 km free per day. \n If you exceed 50 km you are charged at around €0.25 per km.")
         
         multi = '''This is closely based on some of the car types found at Yuko, GOCAR and Driveyou. 
                    For different options and locations visit their sites for accurate pricing and details.
